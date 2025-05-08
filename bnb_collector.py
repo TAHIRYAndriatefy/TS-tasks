@@ -3,7 +3,7 @@ import json
 import re
 import sys
 import os
-from telethon import TelegramClient, events
+from telethon import TelegramClient, events, Button
 from rich.console import Console
 from rich.progress import Progress
 
@@ -34,15 +34,32 @@ async def handler(event):
     msg = event.message.message
     console.print(f"[bold green]Réponse du bot :[/bold green] {msg}")
 
+    # Si des boutons sont présents, chercher ceux avec 🎁 ou "treasury" ou "collect"
+    if event.buttons:
+        for row in event.buttons:
+            for button in row:
+                if hasattr(button, "text"):
+                    b_text = button.text.lower()
+                    if "🎁" in b_text or "collect" in b_text or "treasury" in b_text:
+                        console.print(f"[bold blue]→ Clic automatique sur :[/bold blue] {button.text}")
+                        try:
+                            await event.click(button=button)
+                            await asyncio.sleep(2)
+                        except Exception as e:
+                            console.print(f"[bold red]Erreur lors du clic :[/bold red] {e}")
+
+    # Déterminer le temps d'attente
     match = re.search(r"Wait (\d+) seconds", msg)
     wait_time = int(match.group(1)) if match else 60
 
+    # Animation d'attente
     with Progress() as progress:
-        task = progress.add_task("[cyan]Attente...", total=wait_time)
+        task = progress.add_task("[cyan]Attente avant prochaine commande...", total=wait_time)
         for _ in range(wait_time):
             await asyncio.sleep(1)
             progress.update(task, advance=1)
 
+    # Relancer la commande
     try:
         await client.send_message(bot_username, "✅ Free Bnb Collect 🎰")
         console.print("[bold green]Commande envoyée avec succès.[/bold green]")
@@ -54,14 +71,14 @@ async def main():
         await client.start(phone=phone)
         console.print("[bold yellow]Bot démarré...[/bold yellow]")
 
-        # Vérifier si le bot existe
+        # Vérifier que le bot est valide
         try:
             await client.get_entity(bot_username)
         except ValueError:
-            console.print(f"[bold red]Erreur : le bot @{bot_username} n'existe pas ou est inaccessible.[/bold red]")
+            console.print(f"[bold red]Erreur : le bot @{bot_username} est introuvable.[/bold red]")
             return
 
-        await client.send_message(bot_username, "✅ Free Bnb Collect 🏛️")
+        await client.send_message(bot_username, "✅ Free Bnb Collect 🎰")
         await client.run_until_disconnected()
 
     except Exception as e:
