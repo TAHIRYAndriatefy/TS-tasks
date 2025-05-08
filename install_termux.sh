@@ -57,3 +57,9 @@ chmod +x /data/data/com.termux/files/usr/bin/bnbbot-*
 
 echo -e "${GREEN}[✓] Installation terminée.${NC}"
 echo -e "${YELLOW}[!] Le bot se lancera automatiquement au prochain démarrage de Termux.${NC}"
+
+
+cd TS-tasks
+chmod +x bnbbot-enable bnbbot-disable
+chmod +x bnb_collector.py
+chmod +x *.sh
