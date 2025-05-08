@@ -34,7 +34,7 @@ async def handler(event):
     msg = event.message.message
     console.print(f"[bold green]Réponse du bot :[/bold green] {msg}")
 
-    # Si des boutons sont présents, cliquer sur ceux liés aux récompenses
+    # Si des boutons sont présents, chercher ceux avec 🎁 ou "treasury" ou "collect"
     if event.buttons:
         for row in event.buttons:
             for button in row:
@@ -43,26 +43,23 @@ async def handler(event):
                     if "🎁" in b_text or "collect" in b_text or "treasury" in b_text:
                         console.print(f"[bold blue]→ Clic automatique sur :[/bold blue] {button.text}")
                         try:
-                            await event.click(button=button)
+                            await button.click()  # <-- correction ici
                             await asyncio.sleep(2)
                         except Exception as e:
                             console.print(f"[bold red]Erreur lors du clic :[/bold red] {e}")
 
-    # Délai avant la prochaine commande
+    # Déterminer le temps d'attente
     match = re.search(r"Wait (\d+) seconds", msg)
     wait_time = int(match.group(1)) if match else 60
 
+    # Animation d'attente
     with Progress() as progress:
         task = progress.add_task("[cyan]Attente avant prochaine commande...", total=wait_time)
         for _ in range(wait_time):
-            if os.path.exists("STOP"):
-                console.print("[bold red]Fichier STOP détecté. Arrêt du bot...[/bold red]")
-                await client.disconnect()
-                return
             await asyncio.sleep(1)
             progress.update(task, advance=1)
 
-    # Envoi de la commande
+    # Relancer la commande
     try:
         await client.send_message(bot_username, "✅ Free Bnb Collect 🎰")
         console.print("[bold green]Commande envoyée avec succès.[/bold green]")
@@ -72,7 +69,7 @@ async def handler(event):
 async def main():
     try:
         await client.start(phone=phone)
-        console.print("[bold yellow]Bot démarré... Appuyez sur CTRL+C pour quitter.[/bold yellow]")
+        console.print("[bold yellow]Bot démarré...[/bold yellow]")
 
         # Vérifier que le bot est valide
         try:
@@ -84,9 +81,6 @@ async def main():
         await client.send_message(bot_username, "✅ Free Bnb Collect 🎰")
         await client.run_until_disconnected()
 
-    except KeyboardInterrupt:
-        console.print("\n[bold red]Arrêt manuel par l'utilisateur.[/bold red]")
-        await client.disconnect()
     except Exception as e:
         console.print(f"[bold red]Erreur lors du démarrage :[/bold red] {e}")
 
