@@ -5,7 +5,6 @@ import sys
 import os
 from telethon import TelegramClient, events, Button
 from rich.console import Console
-from rich.progress import Progress
 
 console = Console()
 
@@ -48,23 +47,26 @@ async def handler(event):
                         except Exception as e:
                             console.print(f"[bold red]Erreur lors du clic :[/bold red] {e}")
 
-    # Stop de 5 secondes après la réponse du bot
+    # Pause de 5 secondes avant la commande suivante
     console.print("[bold magenta]⏳ Pause de 5 secondes avant la prochaine commande...[/bold magenta]")
     for i in range(1, 6):
         console.print(f"[magenta]   → {i}[/magenta]", end="\r")
         await asyncio.sleep(1)
-    console.print("")  # ligne vide pour bien afficher ensuite
+    console.print("")  # ligne vide pour lisibilité
 
     # Déterminer le temps d'attente
     match = re.search(r"Wait (\d+) seconds", msg)
     wait_time = int(match.group(1)) if match else 60
 
-    # Animation d'attente
-    with Progress() as progress:
-        task = progress.add_task("[cyan]Attente avant prochaine commande...", total=wait_time)
-        for _ in range(wait_time):
-            await asyncio.sleep(1)
-            progress.update(task, advance=1)
+    # Barre de progression ASCII
+    console.print(f"[cyan]Attente avant prochaine commande...[/cyan] ({wait_time} secondes)")
+    for i in range(wait_time):
+        percent = int((i + 1) / wait_time * 100)
+        bar = "━" * int(percent / 4) + "╺" + "━" * (25 - int(percent / 4))
+        timer = f"{wait_time - i:02}s"
+        console.print(f"[magenta]{bar} {percent}% ({timer})[/magenta]", end="\r")
+        await asyncio.sleep(1)
+    console.print()  # ligne propre
 
     # Relancer la commande
     try:
