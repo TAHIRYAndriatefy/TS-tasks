@@ -5,6 +5,7 @@ import sys
 import os
 from telethon import TelegramClient, events, Button
 from rich.console import Console
+from rich.progress import Progress, BarColumn, TimeRemainingColumn
 
 console = Console()
 
@@ -27,6 +28,13 @@ phone = config.get("phone")
 bot_username = "Free_Binance_Bnb_Pay_Bot"
 
 client = TelegramClient("bnb_session", api_id, api_hash)
+progress = Progress(
+    "[progress.description]{task.description}",
+    BarColumn(),
+    "[progress.percentage]{task.percentage:>3.0f}%",
+    TimeRemainingColumn(),
+    console=console,
+)
 
 @client.on(events.NewMessage(from_users=bot_username))
 async def handler(event):
@@ -47,26 +55,23 @@ async def handler(event):
                         except Exception as e:
                             console.print(f"[bold red]Erreur lors du clic :[/bold red] {e}")
 
-    # Pause de 5 secondes avant la commande suivante
+    # Pause de 5 secondes
     console.print("[bold magenta]⏳ Pause de 5 secondes avant la prochaine commande...[/bold magenta]")
     for i in range(1, 6):
         console.print(f"[magenta]   → {i}[/magenta]", end="\r")
         await asyncio.sleep(1)
-    console.print("")  # ligne vide pour lisibilité
+    console.print("")
 
-    # Déterminer le temps d'attente
+    # Déterminer le temps d’attente
     match = re.search(r"Wait (\d+) seconds", msg)
     wait_time = int(match.group(1)) if match else 60
 
-    # Barre de progression ASCII
-    console.print(f"[cyan]Attente avant prochaine commande...[/cyan] ({wait_time} secondes)")
-    for i in range(wait_time):
-        percent = int((i + 1) / wait_time * 100)
-        bar = "━" * int(percent / 4) + "╺" + "━" * (25 - int(percent / 4))
-        timer = f"{wait_time - i:02}s"
-        console.print(f"[magenta]{bar} {percent}% ({timer})[/magenta]", end="\r")
-        await asyncio.sleep(1)
-    console.print()  # ligne propre
+    # Afficher la barre de progression (sans recréer Progress)
+    with progress:
+        task = progress.add_task("Attente avant prochaine commande...", total=wait_time)
+        for _ in range(wait_time):
+            await asyncio.sleep(1)
+            progress.update(task, advance=1)
 
     # Relancer la commande
     try:
@@ -80,7 +85,6 @@ async def main():
         await client.start(phone=phone)
         console.print("[bold yellow]Bot démarré...[/bold yellow]")
 
-        # Vérifier que le bot est valide
         try:
             await client.get_entity(bot_username)
         except ValueError:
