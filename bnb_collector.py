@@ -3,9 +3,9 @@ import json
 import re
 import sys
 import os
-from telethon import TelegramClient, events, Button
+from telethon import TelegramClient, events
 from rich.console import Console
-from rich.progress import Progress, BarColumn, TimeRemainingColumn
+from rich.progress import Progress
 
 console = Console()
 
@@ -28,20 +28,16 @@ phone = config.get("phone")
 bot_username = "Free_Binance_Bnb_Pay_Bot"
 
 client = TelegramClient("bnb_session", api_id, api_hash)
-progress = Progress(
-    "[progress.description]{task.description}",
-    BarColumn(),
-    "[progress.percentage]{task.percentage:>3.0f}%",
-    TimeRemainingColumn(),
-    console=console,
-)
+
+# Une seule instance Progress partagée
+progress_bar = Progress()
 
 @client.on(events.NewMessage(from_users=bot_username))
 async def handler(event):
     msg = event.message.message
     console.print(f"[bold green]Réponse du bot :[/bold green] {msg}")
 
-    # Si des boutons sont présents, chercher ceux avec 🎁 ou "treasury" ou "collect"
+    # Clic automatique si bouton de collecte détecté
     if event.buttons:
         for row in event.buttons:
             for button in row:
@@ -55,25 +51,18 @@ async def handler(event):
                         except Exception as e:
                             console.print(f"[bold red]Erreur lors du clic :[/bold red] {e}")
 
-    # Pause de 5 secondes
-    console.print("[bold magenta]⏳ Pause de 5 secondes avant la prochaine commande...[/bold magenta]")
-    for i in range(1, 6):
-        console.print(f"[magenta]   → {i}[/magenta]", end="\r")
-        await asyncio.sleep(1)
-    console.print("")
-
-    # Déterminer le temps d’attente
+    # Temps d’attente extrait du message ou 60 sec par défaut
     match = re.search(r"Wait (\d+) seconds", msg)
     wait_time = int(match.group(1)) if match else 60
 
-    # Afficher la barre de progression (sans recréer Progress)
-    with progress:
-        task = progress.add_task("Attente avant prochaine commande...", total=wait_time)
+    # Attente avec barre de progression
+    with progress_bar:
+        task = progress_bar.add_task("[cyan]Attente avant prochaine commande...", total=wait_time)
         for _ in range(wait_time):
             await asyncio.sleep(1)
-            progress.update(task, advance=1)
+            progress_bar.update(task, advance=1)
 
-    # Relancer la commande
+    # Relance automatique de la commande
     try:
         await client.send_message(bot_username, "✅ Free Bnb Collect 🎰")
         console.print("[bold green]Commande envoyée avec succès.[/bold green]")
