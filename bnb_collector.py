@@ -43,8 +43,12 @@ async def handler(event):
                     if "🎁" in b_text or "collect" in b_text or "treasury" in b_text:
                         console.print(f"[bold blue]→ Clic automatique sur :[/bold blue] {button.text}")
                         try:
-                            await button.click()  # Tentative de clic
-                            await asyncio.sleep(2)
+                            await button.click()
+                            console.print("[bold magenta]⏳ Récompense en cours de collecte, veuillez patienter 5 secondes...[/bold magenta]")
+                            for i in range(1, 6):
+                                console.print(f"[magenta]   → {i}[/magenta]", end="\r")
+                                await asyncio.sleep(1)
+                            console.print("")  # pour passer à la ligne proprement
                         except Exception as e:
                             console.print(f"[bold red]Erreur lors du clic :[/bold red] {e}")
 
