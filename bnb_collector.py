@@ -9,12 +9,12 @@ from rich.progress import Progress
 
 console = Console()
 
-# Vérifier que config.json existe
+# Vérification du fichier config.json
 if not os.path.isfile("config.json"):
     console.print("[bold red]Erreur : le fichier config.json est introuvable.[/bold red]")
     sys.exit(1)
 
-# Charger la configuration
+# Chargement de la configuration
 with open("config.json", "r") as f:
     try:
         config = json.load(f)
@@ -29,15 +29,22 @@ bot_username = "Free_Binance_Bnb_Pay_Bot"
 
 client = TelegramClient("bnb_session", api_id, api_hash)
 
-# Une seule instance Progress partagée
-progress_bar = Progress()
+# Pour éviter les répétitions
+last_message = ""
 
 @client.on(events.NewMessage(from_users=bot_username))
 async def handler(event):
+    global last_message
     msg = event.message.message
+
+    # Ignorer les doublons exacts
+    if msg == last_message:
+        return
+    last_message = msg
+
     console.print(f"[bold green]Réponse du bot :[/bold green] {msg}")
 
-    # Clic automatique si bouton de collecte détecté
+    # Clic automatique si bouton détecté
     if event.buttons:
         for row in event.buttons:
             for button in row:
@@ -51,18 +58,21 @@ async def handler(event):
                         except Exception as e:
                             console.print(f"[bold red]Erreur lors du clic :[/bold red] {e}")
 
-    # Temps d’attente extrait du message ou 60 sec par défaut
+    # Temps d'attente extrait ou par défaut
     match = re.search(r"Wait (\d+) seconds", msg)
     wait_time = int(match.group(1)) if match else 60
 
-    # Attente avec barre de progression
-    with progress_bar:
-        task = progress_bar.add_task("[cyan]Attente avant prochaine commande...", total=wait_time)
-        for _ in range(wait_time):
-            await asyncio.sleep(1)
-            progress_bar.update(task, advance=1)
+    # Affichage barre de progression propre
+    try:
+        with Progress() as progress:
+            task = progress.add_task("[cyan]Attente avant prochaine commande...", total=wait_time)
+            for _ in range(wait_time):
+                await asyncio.sleep(1)
+                progress.update(task, advance=1)
+    except Exception as e:
+        console.print(f"[bold red]Erreur durant l'attente :[/bold red] {e}")
 
-    # Relance automatique de la commande
+    # Renvoi de la commande
     try:
         await client.send_message(bot_username, "✅ Free Bnb Collect 🎰")
         console.print("[bold green]Commande envoyée avec succès.[/bold green]")
