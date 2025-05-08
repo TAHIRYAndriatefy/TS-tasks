@@ -44,13 +44,16 @@ async def handler(event):
                         console.print(f"[bold blue]→ Clic automatique sur :[/bold blue] {button.text}")
                         try:
                             await button.click()
-                            console.print("[bold magenta]⏳ Récompense en cours de collecte, veuillez patienter 5 secondes...[/bold magenta]")
-                            for i in range(1, 6):
-                                console.print(f"[magenta]   → {i}[/magenta]", end="\r")
-                                await asyncio.sleep(1)
-                            console.print("")  # pour passer à la ligne proprement
+                            await asyncio.sleep(2)
                         except Exception as e:
                             console.print(f"[bold red]Erreur lors du clic :[/bold red] {e}")
+
+    # Stop de 5 secondes après la réponse du bot
+    console.print("[bold magenta]⏳ Pause de 5 secondes avant la prochaine commande...[/bold magenta]")
+    for i in range(1, 6):
+        console.print(f"[magenta]   → {i}[/magenta]", end="\r")
+        await asyncio.sleep(1)
+    console.print("")  # ligne vide pour bien afficher ensuite
 
     # Déterminer le temps d'attente
     match = re.search(r"Wait (\d+) seconds", msg)
