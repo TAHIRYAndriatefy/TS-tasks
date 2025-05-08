@@ -9,14 +9,23 @@ from rich.progress import Progress
 
 console = Console()
 
+# Vérifier que config.json existe
+if not os.path.isfile("config.json"):
+    console.print("[bold red]Erreur : le fichier config.json est introuvable.[/bold red]")
+    sys.exit(1)
+
 # Charger la configuration
 with open("config.json", "r") as f:
-    config = json.load(f)
+    try:
+        config = json.load(f)
+    except json.JSONDecodeError:
+        console.print("[bold red]Erreur : config.json est mal formé.[/bold red]")
+        sys.exit(1)
 
-api_id = config["api_id"]
-api_hash = config["api_hash"]
-phone = config["phone"]
-bot_username = "LegitBotsOnline"
+api_id = config.get("api_id")
+api_hash = config.get("api_hash")
+phone = config.get("phone")
+bot_username = "Free_Binance_Bnb_Pay_Bot"
 
 client = TelegramClient("bnb_session", api_id, api_hash)
 
@@ -41,10 +50,22 @@ async def handler(event):
         console.print(f"[bold red]Erreur lors de l'envoi :[/bold red] {e}")
 
 async def main():
-    await client.start(phone=phone)
-    console.print("[bold yellow]Bot démarré...[/bold yellow]")
-    await client.send_message(bot_username, "✅ Free Bnb Collect 🏛️")
-    await client.run_until_disconnected()
+    try:
+        await client.start(phone=phone)
+        console.print("[bold yellow]Bot démarré...[/bold yellow]")
+
+        # Vérifier si le bot existe
+        try:
+            await client.get_entity(bot_username)
+        except ValueError:
+            console.print(f"[bold red]Erreur : le bot @{bot_username} n'existe pas ou est inaccessible.[/bold red]")
+            return
+
+        await client.send_message(bot_username, "✅ Free Bnb Collect 🏛️")
+        await client.run_until_disconnected()
+
+    except Exception as e:
+        console.print(f"[bold red]Erreur lors du démarrage :[/bold red] {e}")
 
 with client:
     client.loop.run_until_complete(main())
