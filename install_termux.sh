@@ -9,7 +9,8 @@ echo -e "${YELLOW}[•] Mise à jour de Termux...${NC}"
 pkg update -y && pkg upgrade -y
 
 echo -e "${YELLOW}[•] Installation des paquets requis...${NC}"
-pkg install python -y
+pkg install python git -y
+pip install --upgrade pip
 pip install telethon rich
 
 echo -e "${GREEN}[✓] Dépendances installées.${NC}"
@@ -27,7 +28,7 @@ read -p "Téléphone (+XXX...): " phone
 # Création du fichier config.json
 cat > config.json <<EOF
 {
-  "api_id": $api_id,
+  "api_id": "$api_id",
   "api_hash": "$api_hash",
   "phone": "$phone"
 }
@@ -45,21 +46,19 @@ EOF
 chmod +x bnbbot
 mv bnbbot /data/data/com.termux/files/usr/bin/
 
-# Ajout au démarrage automatique
+# Déplacement des fichiers de contrôle (s’ils existent)
+[ -f "bnbbot-disable" ] && mv bnbbot-disable /data/data/com.termux/files/usr/bin/
+[ -f "bnbbot-enable" ] && mv bnbbot-enable /data/data/com.termux/files/usr/bin/
+chmod +x /data/data/com.termux/files/usr/bin/bnbbot-*
+
+# Ajout au démarrage automatique si non présent
 if ! grep -q "bnbbot" ~/.bashrc; then
   echo "bnbbot" >> ~/.bashrc
 fi
 
-# Déplacement des fichiers de contrôle
-mv bnbbot-disable /data/data/com.termux/files/usr/bin/
-mv bnbbot-enable /data/data/com.termux/files/usr/bin/
-chmod +x /data/data/com.termux/files/usr/bin/bnbbot-*
-
 echo -e "${GREEN}[✓] Installation terminée.${NC}"
 echo -e "${YELLOW}[!] Le bot se lancera automatiquement au prochain démarrage de Termux.${NC}"
 
-
-cd TS-tasks
-chmod +x bnbbot-enable bnbbot-disable
-chmod +x bnb_collector.py
-chmod +x *.sh
+# Permissions sur les scripts
+cd TS-tasks 2>/dev/null || echo -e "${YELLOW}Dossier TS-tasks introuvable. Veuillez vérifier.${NC}"
+chmod +x bnb_collector.py *.sh 2>/dev/null
