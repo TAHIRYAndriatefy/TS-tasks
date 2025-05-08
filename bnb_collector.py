@@ -44,7 +44,7 @@ async def handler(event):
             progress.update(task, advance=1)
 
     try:
-        await client.send_message(bot_username, "✅ Free Bnb Collect 🏛️")
+        await client.send_message(bot_username, "✅ Free Bnb Collect 🎰")
         console.print("[bold green]Commande envoyée avec succès.[/bold green]")
     except Exception as e:
         console.print(f"[bold red]Erreur lors de l'envoi :[/bold red] {e}")
