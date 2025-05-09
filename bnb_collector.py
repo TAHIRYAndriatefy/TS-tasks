@@ -44,9 +44,9 @@ async def collect_bnb():
         try:
             console.print("[bold blue]→ Mandefa baiko :[/bold blue] ✅ Free Bnb Collect 🎰")
             await client.send_message(bot_username, "✅ Free Bnb Collect 🎰")
-            await asyncio.sleep(5)
+            await asyncio.sleep(0)
 
-            messages = await client.get_messages(bot_username, limit=5)
+            messages = await client.get_messages(bot_username, limit=3)
             wait_time = 60
             reward_logged = False
 
