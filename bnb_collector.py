@@ -1,3 +1,4 @@
+
 import asyncio
 import json
 import os
@@ -25,6 +26,32 @@ try:
         config = json.load(f)
 except json.JSONDecodeError:
     console.print(Panel.fit("[bold red]Hadisoana: tsy marina ny endrik'ilay config.json[/bold red]", border_style="red"))
+    sys.exit(1)
+
+# Fanamarinana fahazoan-dalana
+if not os.path.isfile("license.json"):
+    console.print(Panel.fit("[bold red]Tsy nahitana license.json![/bold red]\nAzafady mifandraisa amin'ny mpanome kaody.", border_style="red"))
+    sys.exit(1)
+
+try:
+    with open("license.json", "r") as lic_file:
+        license_data = json.load(lic_file)
+except:
+    console.print(Panel.fit("[bold red]Tsy afaka namaky ny license.json![/bold red]", border_style="red"))
+    sys.exit(1)
+
+user_code = license_data.get("user_code")
+expire_on = license_data.get("expire_on")
+
+if not user_code or not expire_on:
+    console.print(Panel.fit("[bold red]License tsy manankery.[/bold red]", border_style="red"))
+    sys.exit(1)
+
+today = datetime.now().date()
+expire_date = datetime.strptime(expire_on, "%Y-%m-%d").date()
+
+if today > expire_date:
+    console.print(Panel.fit(f"[bold red]Tapitra ny fahazoanao miditra tamin'ny : {expire_on}[/bold red]", border_style="red"))
     sys.exit(1)
 
 # Fangalana ny angon-drakitra
@@ -55,7 +82,6 @@ async def collect_bnb():
                 if not msg or "Free Bnb Collect" in msg:
                     continue
 
-                # Raha valisoa, aseho raha mbola tsy voaray
                 if "successfully collected" in msg.lower():
                     if msg in reward_history:
                         continue
@@ -67,15 +93,12 @@ async def collect_bnb():
                     reward_logged = True
                     continue
 
-                # Aseho ho hafatra voaray
                 console.print(Panel.fit(f"[bold green]→ Hafatra voaray :[/bold green]\n{msg}", border_style="green"))
 
-                # Fijerena raha misy fanemorana fotoana
                 match = re.search(r"again in (\d+) seconds", msg)
                 if match:
                     wait_time = int(match.group(1))
 
-                # Fikarohana bokotra tsindriana
                 if response.buttons:
                     clicked = False
                     for row in response.buttons:
