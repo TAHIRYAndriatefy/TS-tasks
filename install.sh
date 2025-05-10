@@ -1,19 +1,3 @@
-Voici la version corrigée et propre de ton script avec les améliorations suivantes :
-
-Meilleure indentation
-
-Corrigé l’erreur dans le bloc ~/.bashrc
-
-Messages plus clairs
-
-Ajout de protections en cas d’erreur
-
-
-
----
-
-Script corrigé : install_ts_task.sh
-
 #!/data/data/com.termux/files/usr/bin/bash
 
 # Couleurs
@@ -91,13 +75,7 @@ chmod +x *.sh *.py
 
 # Lancement
 bash install-cron-update.sh 2>/dev/null
-bash start.sh 2>/dev/null
 
 read -p "TSINDRIO NY TOUCHE ENTRÉE"
+bash start.sh 2>/dev/null
 clear
-
-
----
-
-Souhaites-tu que je t’envoie ce fichier prêt à utiliser dans un .zip ou que je l’intègre dans ton projet TS-tasks ?
-
