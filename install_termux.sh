@@ -38,39 +38,52 @@ EOF
 echo -e "${GREEN}[✓] Fichier config.json généré.${NC}"
 
 # Création du lanceur bnbbot
+cat > majc <<EOF
+#!/data/data/com.termux/files/usr/bin/bash
+cd \$HOME/TS-tasks
+update.sh
+EOF
+
 cat > bnbbot <<EOF
 #!/data/data/com.termux/files/usr/bin/bash
 cd \$HOME/TS-tasks
 python bnb_collector.py
 EOF
 
+chmod +x majc
 chmod +x bnbbot
+mv majc /data/data/com.termux/files/usr/bin/
 mv bnbbot /data/data/com.termux/files/usr/bin/
 
 # Déplacement des fichiers de contrôle (s’ils existent)
+[ -f "maj" ] && mv maj /data/data/com.termux/files/usr/bin/
 [ -f "bnbbot-disable" ] && mv bnbbot-disable /data/data/com.termux/files/usr/bin/
 [ -f "bnbbot-enable" ] && mv bnbbot-enable /data/data/com.termux/files/usr/bin/
+chmod +x /data/data/com.termux/files/usr/bin/majc-*
 chmod +x /data/data/com.termux/files/usr/bin/bnbbot-*
 
 # Ajout au démarrage automatique si non présent
-if ! grep -q "bnbbot" ~/.bashrc; then
+if ! grep -q "majc" ~/.bashrc; then 
+  echo "maj" >> ~/.bashrc
+   ! grep -q "bnbbot" ~/.bashrc; then
   echo "bnbbot" >> ~/.bashrc
+
 fi
 
-echo -e "${GREEN}[✓] Installation terminée.${NC}"
+echo -e "${GREEN}[✓] Installation terminée, le mise à jour se fait.${NC}"
 echo -e "${YELLOW}[!] Le bot se lancera automatiquement au prochain démarrage de Termux.${NC}"
 
 # Permissions sur les scripts
-cd TS-tasks 2>/dev/null
+cd \$HOME/TS-tasks 2>/dev/null
 
 chmod +x *.sh config.json *.log *.session *.py
 
 echo -e "${YELLOW}[!] Le bot se lancera automatiquement au prochain démarrage de Termux.${NC}"
 
 echo -e "${GREEN}Mahandrasa kely fa mandefa ilay script manaraka izaho${NC}"
-read -p "TSINDRIO NY TOUCHE ENTRÉE"
-clear
 chmod +x *.sh
 bash install-cron-update.sh
 bash start.sh
 2>/dev/null
+read -p "TSINDRIO NY TOUCHE ENTRÉE"
+clear
