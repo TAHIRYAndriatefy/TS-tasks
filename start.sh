@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/bash
+#!/data/data/com.termux/files/usr/bnb_collector.sh_bin/bin/bash
 
 # Couleurs
 RED='\033[1;31m'
