@@ -13,7 +13,7 @@ from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeEl
 console = Console()
 lock = asyncio.Lock()
 
-console.print(Panel.fit("[bold cyan]TS BNB Collector[/bold cyan]\n[green]Nataon'i TAHIRY TS[/green]", border_style="bold magenta"))
+console.print(Panel.fit("[bold cyan]<====>>TS BNB AUTOCLICK<<====>[/bold cyan]\n[green]CREE PAR TAHIRY TS[/green]", border_style="bold magenta"))
 
 # Fanamarinana raha misy ilay rakitra config.json
 if not os.path.isfile("config.json"):
