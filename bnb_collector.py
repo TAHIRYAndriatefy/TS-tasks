@@ -5,6 +5,7 @@ import sys
 import re
 from datetime import datetime
 from telethon import TelegramClient
+from telethon.errors import SessionPasswordNeededError
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeElapsedColumn
@@ -101,9 +102,21 @@ async def collect_bnb():
 
 async def main():
     try:
-        await client.start(phone=phone)
-        console.print(Panel.fit("[bold yellow]Fifandraisana nahomby![/bold yellow]\n[blue]Manomboka ny fitrandrahana BNB...[/blue]", border_style="yellow"))
+        await client.connect()
+        if not await client.is_user_authorized():
+            console.print(Panel.fit("[bold yellow]Fidirana voalohany : mila manamarina kaody[/bold yellow]", border_style="yellow"))
+            await client.send_code_request(phone)
+            code = console.input("[bold cyan]→ Ampidiro ny kaody nalefa (Telegram/SMS) : [/bold cyan]")
+            try:
+                await client.sign_in(phone, code)
+            except SessionPasswordNeededError:
+                console.print("[bold red]Mila tenimiafina fanampiny (2FA).[/bold red]")
+                password = console.input("[bold yellow]→ Ampidiro ny tenimiafina 2FA : [/bold yellow]")
+                await client.sign_in(password=password)
+
+        console.print(Panel.fit("[bold green]✅ Fidirana nahomby![/bold green]\nManomboka ny fitrandrahana BNB...", border_style="green"))
         await collect_bnb()
+
     except Exception as e:
         console.print(Panel.fit(f"[bold red]Hadisoana fanombohana: {e}[/bold red]", border_style="red"))
 
