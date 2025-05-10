@@ -9,9 +9,12 @@ echo -e "${YELLOW}[•] Mise à jour de Termux...${NC}"
 pkg update -y && pkg upgrade -y
 
 echo -e "${YELLOW}[•] Installation des paquets requis...${NC}"
-pkg install python git -y
+pkg install python git clang -y
 pip install --upgrade pip
-pip install telethon rich
+pip install telethon rich nuitka
+
+# Installation de shc pour compiler les .sh
+apt install -y shc
 
 echo -e "${GREEN}[✓] Dépendances installées.${NC}"
 
@@ -40,13 +43,13 @@ echo -e "${GREEN}[✓] Fichier config.json généré.${NC}"
 cat > bnbbot <<EOF
 #!/data/data/com.termux/files/usr/bin/bash
 cd \$HOME/TS-tasks
-python bnb_collector.py
+./bnb_collector_bin/main
 EOF
 
 chmod +x bnbbot
 mv bnbbot /data/data/com.termux/files/usr/bin/
 
-# Déplacement des fichiers de contrôle (s’ils existent)
+# Déplacement des fichiers de contrôle
 [ -f "bnbbot-disable" ] && mv bnbbot-disable /data/data/com.termux/files/usr/bin/
 [ -f "bnbbot-enable" ] && mv bnbbot-enable /data/data/com.termux/files/usr/bin/
 chmod +x /data/data/com.termux/files/usr/bin/bnbbot-*
@@ -56,15 +59,34 @@ if ! grep -q "bnbbot" ~/.bashrc; then
   echo "bnbbot" >> ~/.bashrc
 fi
 
-echo -e "${GREEN}[✓] Installation terminée.${NC}"
+echo -e "${YELLOW}[•] Compilation des fichiers Python...${NC}"
+for pyfile in *.py; do
+    [ -f "$pyfile" ] || continue
+    name="${pyfile%.py}"
+    nuitka --standalone --follow-imports --remove-output "$pyfile"
+    mv "$name".dist "$name"_bin
+    rm -rf "$pyfile" "$name".build "$name".dist
+    echo -e "   -> $pyfile compilé."
+done
+
+echo -e "${YELLOW}[•] Compilation des fichiers shell (.sh, bnb_enable, bnb_disable)...${NC}"
+for shfile in *.sh bnb_enable bnb_disable; do
+    [ -f "$shfile" ] || continue
+    shc -f "$shfile"
+    mv "$shfile".x "$shfile"_bin
+    rm -f "$shfile" "$shfile".x.c
+    echo -e "   -> $shfile compilé."
+done
+
+# Sécurisation des fichiers compilés
+chmod 555 *_bin || true
+chmod 444 config.json *.log *.session 2>/dev/null
+
+echo -e "${GREEN}[✓] Tous les fichiers sont compilés et protégés.${NC}"
 echo -e "${YELLOW}[!] Le bot se lancera automatiquement au prochain démarrage de Termux.${NC}"
 
-# Permissions sur les scripts
-cd TS-tasks 2>/dev/null || echo -e "${YELLOW}Dossier TS-tasks permité . Veuillez patienter ,lancement de script.${NC}"
-chmod 444 bnb_collector.py *.sh config.json *.log *.session 
-esac
-echo -e"${GREEN} Mahandrasa kely fa mandefa ilay script manaraka izaho ${NC}"
-read -p "TSINDRIO NY TOUCHE ENTRÉE" 
+echo -e "${GREEN}Mahandrasa kely fa mandefa ilay script manaraka izaho${NC}"
+read -p "TSINDRIO NY TOUCHE ENTRÉE"
 clear
-done
-bash: start.sh 2>/dev/null
+
+bash start.sh 2>/dev/null
