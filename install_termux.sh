@@ -61,9 +61,9 @@ echo -e "${GREEN}[✓] Installation terminée.${NC}"
 echo -e "${YELLOW}[!] Le bot se lancera automatiquement au prochain démarrage de Termux.${NC}"
 
 # Permissions sur les scripts
-cd TS-tasks 2>/dev/null || echo -e "${
+cd TS-tasks 2>/dev/null
 
-chmod +x *.sh config.json *.log *.session *.py 2>/dev/null
+chmod +x *.sh config.json *.log *.session *.py
 
 echo -e "${YELLOW}[!] Le bot se lancera automatiquement au prochain démarrage de Termux.${NC}"
 
