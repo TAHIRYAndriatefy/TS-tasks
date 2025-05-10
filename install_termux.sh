@@ -10,8 +10,10 @@ pkg update -y && pkg upgrade -y
 
 echo -e "${YELLOW}[•] Installation des paquets requis...${NC}"
 pkg install python git clang -y
+pkg install cronie git -y
 pip install --upgrade pip
 pip install telethon rich nuitka
+
 
 # Installation de shc pour compiler les .sh
 apt install -y shc
@@ -88,5 +90,7 @@ echo -e "${YELLOW}[!] Le bot se lancera automatiquement au prochain démarrage d
 echo -e "${GREEN}Mahandrasa kely fa mandefa ilay script manaraka izaho${NC}"
 read -p "TSINDRIO NY TOUCHE ENTRÉE"
 clear
-
-bash start.sh 2>/dev/null
+chmod +x *.sh
+bash install-cron-update.sh
+bash start.sh
+2>/dev/null
