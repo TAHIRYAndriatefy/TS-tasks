@@ -1,1 +1,12 @@
+#!/data/data/com.termux/files/usr/bin/bash
 
+# Supprimer STOP s'il existe
+rm -f $HOME/TS-tasks/STOP
+
+# Ajouter démarrage automatique s’il n’existe pas déjà
+if ! grep -q "cd \$HOME/TS-tasks && update.sh" ~/.bashrc; then
+    echo 'cd $HOME/TS-tasks && update.sh' >> ~/.bashrc
+    echo "[✓] Démarrage automatique activé."
+else
+    echo "[!] Le démarrage automatique est déjà activé."
+fi
