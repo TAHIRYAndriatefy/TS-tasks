@@ -1,3 +1,19 @@
+Voici la version corrigée et propre de ton script avec les améliorations suivantes :
+
+Meilleure indentation
+
+Corrigé l’erreur dans le bloc ~/.bashrc
+
+Messages plus clairs
+
+Ajout de protections en cas d’erreur
+
+
+
+---
+
+Script corrigé : install_ts_task.sh
+
 #!/data/data/com.termux/files/usr/bin/bash
 
 # Couleurs
@@ -9,8 +25,7 @@ echo -e "${YELLOW}[•] Mise à jour de Termux...${NC}"
 pkg update -y && pkg upgrade -y
 
 echo -e "${YELLOW}[•] Installation des paquets requis...${NC}"
-pkg install python git -y
-pkg install cronie git -y
+pkg install -y python git cronie
 pip install --upgrade pip
 pip install telethon rich
 
@@ -37,11 +52,11 @@ EOF
 
 echo -e "${GREEN}[✓] Fichier config.json généré.${NC}"
 
-# Création du lanceur bnbbot
+# Création des scripts de lancement
 cat > majc <<EOF
 #!/data/data/com.termux/files/usr/bin/bash
 cd \$HOME/TS-tasks
-update.sh
+./update.sh
 EOF
 
 cat > bnbbot <<EOF
@@ -50,40 +65,39 @@ cd \$HOME/TS-tasks
 python bnb_collector.py
 EOF
 
-chmod +x majc
-chmod +x bnbbot
-mv majc /data/data/com.termux/files/usr/bin/
-mv bnbbot /data/data/com.termux/files/usr/bin/
+chmod +x majc bnbbot
+mv majc bnbbot /data/data/com.termux/files/usr/bin/
 
-# Déplacement des fichiers de contrôle (s’ils existent)
+# Scripts facultatifs
 [ -f "maj" ] && mv maj /data/data/com.termux/files/usr/bin/
 [ -f "bnbbot-disable" ] && mv bnbbot-disable /data/data/com.termux/files/usr/bin/
 [ -f "bnbbot-enable" ] && mv bnbbot-enable /data/data/com.termux/files/usr/bin/
-chmod +x /data/data/com.termux/files/usr/bin/majc-*
-chmod +x /data/data/com.termux/files/usr/bin/bnbbot-*
+chmod +x /data/data/com.termux/files/usr/bin/bnbbot*
 
 # Ajout au démarrage automatique si non présent
-if ! grep -q "majc" ~/.bashrc; then 
+if ! grep -q "maj" ~/.bashrc; then
   echo "maj" >> ~/.bashrc
-   ! grep -q "bnbbot" ~/.bashrc; then
+fi
+if ! grep -q "bnbbot" ~/.bashrc; then
   echo "bnbbot" >> ~/.bashrc
-
 fi
 
-echo -e "${GREEN}[✓] Installation terminée, le mise à jour se fait.${NC}"
+echo -e "${GREEN}[✓] Installation terminée.${NC}"
 echo -e "${YELLOW}[!] Le bot se lancera automatiquement au prochain démarrage de Termux.${NC}"
 
-# Permissions sur les scripts
+# Permissions
 cd \$HOME/TS-tasks 2>/dev/null
+chmod +x *.sh *.py
 
-chmod +x *.sh config.json *.log *.session *.py
+# Lancement
+bash install-cron-update.sh 2>/dev/null
+bash start.sh 2>/dev/null
 
-echo -e "${YELLOW}[!] Le bot se lancera automatiquement au prochain démarrage de Termux.${NC}"
-
-echo -e "${GREEN}Mahandrasa kely fa mandefa ilay script manaraka izaho${NC}"
-chmod +x *.sh
-bash install-cron-update.sh
-bash start.sh
-2>/dev/null
 read -p "TSINDRIO NY TOUCHE ENTRÉE"
 clear
+
+
+---
+
+Souhaites-tu que je t’envoie ce fichier prêt à utiliser dans un .zip ou que je l’intègre dans ton projet TS-tasks ?
+
