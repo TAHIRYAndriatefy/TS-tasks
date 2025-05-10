@@ -6,15 +6,15 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 # Chemin vers le repo local
-REPO_PATH="$HOME/TS-tasks-update"
+REPO_PATH="$HOME/TS-tasks"
 
 # Nouvelle version demandée
-read -p "Entrez la nouvelle version (ex: 1.3.1): " new_version
+echo -e "Nouvelle version: " new_version
 
 # Vérifie si le dossier existe
 if [ ! -d "$REPO_PATH" ]; then
     echo -e "${YELLOW}[•] Clonage du dépôt GitHub...${NC}"
-    git clone https://github.com/VOTRE_UTILISATEUR/TS-tasks-update.git "$REPO_PATH"
+    git clone https://github.com/TAHIRYAndriatefy/TS-tasks.git "$REPO_PATH"
 fi
 
 cd "$REPO_PATH" || exit
