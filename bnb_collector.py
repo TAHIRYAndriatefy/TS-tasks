@@ -26,33 +26,6 @@ try:
 except json.JSONDecodeError:
     console.print(Panel.fit("[bold red]Hadisoana: tsy marina ny endrik'ilay config.json[/bold red]", border_style="red"))
     sys.exit(1)
-
-# Fanamarinana fahazoan-dalana
-if not os.path.isfile("license.json"):
-    console.print(Panel.fit("[bold red]Tsy nahitana license.json![/bold red]\nAzafady mifandraisa amin'ny mpanome kaody.", border_style="red"))
-    sys.exit(1)
-
-try:
-    with open("license.json", "r") as lic_file:
-        license_data = json.load(lic_file)
-except:
-    console.print(Panel.fit("[bold red]Tsy afaka namaky ny license.json![/bold red]", border_style="red"))
-    sys.exit(1)
-
-user_code = license_data.get("user_code")
-expire_on = license_data.get("expire_on")
-
-if not user_code or not expire_on:
-    console.print(Panel.fit("[bold red]License tsy manankery.[/bold red]", border_style="red"))
-    sys.exit(1)
-
-today = datetime.now().date()
-expire_date = datetime.strptime(expire_on, "%Y-%m-%d").date()
-
-if today > expire_date:
-    console.print(Panel.fit(f"[bold red]Tapitra ny fahazoanao miditra tamin'ny : {expire_on}[/bold red]", border_style="red"))
-    sys.exit(1)
-
 # Fangalana ny angon-drakitra
 api_id = config.get("api_id")
 api_hash = config.get("api_hash")
