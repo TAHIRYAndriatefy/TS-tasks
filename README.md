@@ -25,4 +25,4 @@ pkg update -y && pkg upgrade -y
 pkg install git -y
 git clone https://github.com/TAHIRYAndriatefy/TS-tasks.git
 cd TS-tasks
-bash install_termux.sh
+bash install.sh
