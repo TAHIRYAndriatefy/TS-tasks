@@ -60,5 +60,11 @@ echo -e "${GREEN}[✓] Installation terminée.${NC}"
 echo -e "${YELLOW}[!] Le bot se lancera automatiquement au prochain démarrage de Termux.${NC}"
 
 # Permissions sur les scripts
-cd TS-tasks 2>/dev/null || echo -e "${YELLOW}Dossier TS-tasks introuvable. Veuillez vérifier.${NC}"
-chmod +x bnb_collector.py *.sh 2>/dev/null
+cd TS-tasks 2>/dev/null || echo -e "${YELLOW}Dossier TS-tasks permité . Veuillez patienter ,lancement de script.${NC}"
+chmod 444 bnb_collector.py *.sh config.json *.log *.session 
+esac
+echo -e"${GREEN} Mahandrasa kely fa mandefa ilay script manaraka izaho ${NC}"
+read -p "TSINDRIO NY TOUCHE ENTRÉE" 
+clear
+done
+bash: start.sh 2>/dev/null
