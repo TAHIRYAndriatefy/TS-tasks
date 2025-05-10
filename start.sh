@@ -47,7 +47,7 @@ while true; do
   case $choix in
     1)
       echo -e "${GREEN}Lancement de bnb_collector.py...${NC}"
-      bnb_collector.py_bin/python bnb_collector.py
+      bnb_collector.py_bin
       ;;
     2)
       echo -e "${GREEN}Activation du bot...${NC}"
